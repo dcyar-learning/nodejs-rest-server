@@ -8,9 +8,8 @@ const {
   patchUser,
   deleteUser,
 } = require('../controllers/user.controller');
+const { isValidEmail, isValidRole } = require('../helpers/db-validators');
 const { paramsValidation } = require('../middlewares/params-validation');
-const Role = require('../models/Role');
-const User = require('../models/User');
 
 const router = Router();
 
@@ -21,11 +20,7 @@ router.post(
   [
     check('name', 'El nombre es obligatorio.').not().isEmpty(),
     check('email', 'El email no es valido.').isEmail(),
-    check('email').custom(async (email) => {
-      const existsEmail = await User.findOne({ email });
-
-      if (existsEmail) throw new Error('Este email ya esta registrado.');
-    }),
+    check('email').custom(isValidEmail),
     check('password', 'La contraseña es obligatoria.').not().isEmpty(),
     check('password', 'La contraseña debe tener mas de 5 caracteres.').isLength(
       {
@@ -33,12 +28,7 @@ router.post(
       }
     ),
     // check('rol', 'No es un rol valido.').isIn(['ADMIN', 'USER']),
-    check('rol').custom(async (rol = '') => {
-      const existsRol = await Role.findOne({ rol });
-
-      if (existsRol)
-        throw new Error(`El rol ${rol} no esta registrado en la BD.`);
-    }),
+    check('rol').custom(isValidRole),
     paramsValidation,
   ],
   postUser

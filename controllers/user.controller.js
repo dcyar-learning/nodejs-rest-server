@@ -2,7 +2,6 @@ const { response } = require('express');
 const bcryptjs = require('bcryptjs');
 
 const User = require('../models/User');
-const { restart } = require('nodemon');
 
 const getUser = (req, res = response) => {
   res.json({
@@ -28,7 +27,6 @@ const postUser = async (req, res = response) => {
   await user.save();
 
   res.status(201).json({
-    message: 'post API',
     user,
   });
 };
