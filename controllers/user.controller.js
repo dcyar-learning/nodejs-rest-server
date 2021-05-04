@@ -14,14 +14,6 @@ const postUser = async (req, res = response) => {
 
   const user = new User({ name, email, password, rol });
 
-  const emailExists = await User.findOne({ email });
-
-  if (emailExists) {
-    return res
-      .status(400)
-      .json({ message: 'Ya existe una cuenta con este email.' });
-  }
-
   user.password = bcryptjs.hashSync(password, bcryptjs.genSaltSync(10));
 
   await user.save();
