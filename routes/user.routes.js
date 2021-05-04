@@ -8,7 +8,11 @@ const {
   patchUser,
   deleteUser,
 } = require('../controllers/user.controller');
-const { isValidEmail, isValidRole } = require('../helpers/db-validators');
+const {
+  existingId,
+  existingEmail,
+  existingRole,
+} = require('../helpers/db-validators');
 const { paramsValidation } = require('../middlewares/params-validation');
 
 const router = Router();
@@ -20,7 +24,7 @@ router.post(
   [
     check('name', 'El nombre es obligatorio.').not().isEmpty(),
     check('email', 'El email no es valido.').isEmail(),
-    check('email').custom(isValidEmail),
+    check('email').custom(existingEmail),
     check('password', 'La contraseña es obligatoria.').not().isEmpty(),
     check('password', 'La contraseña debe tener mas de 5 caracteres.').isLength(
       {
@@ -28,13 +32,23 @@ router.post(
       }
     ),
     // check('rol', 'No es un rol valido.').isIn(['ADMIN', 'USER']),
-    check('rol').custom(isValidRole),
+    check('rol').custom(existingRole),
     paramsValidation,
   ],
   postUser
 );
 
-router.put('/:id', putUser);
+router.put(
+  '/:id',
+  [
+    check('id', 'No es un ID válido.').isMongoId(),
+    check('id').custom(existingId),
+    // check('email').custom(existingEmail),
+    check('rol').custom(existingRole),
+    paramsValidation,
+  ],
+  putUser
+);
 
 router.patch('/', patchUser);
 

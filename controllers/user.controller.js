@@ -3,9 +3,12 @@ const bcryptjs = require('bcryptjs');
 
 const User = require('../models/User');
 
-const getUser = (req, res = response) => {
+const getUser = async (req, res = response) => {
+  const users = await User.find();
+
   res.json({
-    message: 'get API',
+    message: 'list of users',
+    users,
   });
 };
 
@@ -23,14 +26,19 @@ const postUser = async (req, res = response) => {
   });
 };
 
-const putUser = (req, res = response) => {
+const putUser = async (req, res = response) => {
   const id = req.params.id;
-  const search = req.query.q;
+  const { _id, password, google, email, ...body } = req.body;
+
+  if (password) {
+    body = bcryptjs.hashSync(password, bcryptjs.genSaltSync(10));
+  }
+
+  const user = await User.findByIdAndUpdate(id, body, { new: true });
 
   res.json({
     message: 'put API',
-    id,
-    search,
+    user,
   });
 };
 
