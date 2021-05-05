@@ -8,7 +8,16 @@ const getUser = async (req, res = response) => {
 
   res.json({
     message: 'list of users',
-    users,
+    users: users.map((user) => {
+      return {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        google: user.google,
+        status: user.status,
+        rol: user.rol,
+      };
+    }),
   });
 };
 
