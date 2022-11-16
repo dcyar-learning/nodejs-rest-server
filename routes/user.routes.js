@@ -2,10 +2,10 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 
 const {
-  getUser,
+  getUsers,
+  findById,
   postUser,
   putUser,
-  patchUser,
   deleteUser,
 } = require('../controllers/user.controller');
 const {
@@ -17,7 +17,24 @@ const { paramsValidation } = require('../middlewares/params-validation');
 
 const router = Router();
 
-router.get('/', getUser);
+router.get(
+  '/',
+  [
+    check('limit', 'Ingrese un número válido.').optional().isInt({min: 1}),
+    check('from', 'Ingrese un número válido.').optional().isInt({min: 1}),
+    paramsValidation,
+  ],
+  getUsers);
+
+router.get(
+  '/:id',
+  [
+    check('id', 'No es un ID válido.').isMongoId(),
+    check('id').custom(existingId),
+    paramsValidation,
+  ],
+  findById
+);
 
 router.post(
   '/',
@@ -50,8 +67,14 @@ router.put(
   putUser
 );
 
-router.patch('/', patchUser);
-
-router.delete('/', deleteUser);
+router.delete(
+  '/:id',
+  [
+    check('id', 'No es un ID válido.').isMongoId(),
+    check('id').custom(existingId),
+    paramsValidation,
+  ],
+  deleteUser
+);
 
 module.exports = router;

@@ -3,11 +3,22 @@ const bcryptjs = require('bcryptjs');
 
 const User = require('../models/User');
 
-const getUser = async (req, res = response) => {
-  const users = await User.find();
+const getUsers = async (req, res) => {
+  const { limit = 5, from = 0 } = req.query;
+
+  // const users = await User.find({ status: true })
+  //   .skip(Number(from))
+  //   .limit(Number(limit));
+
+  // const total = await User.countDocuments({ status: true})
+
+  const [ total, users ] = await Promise.all([
+    User.countDocuments({ status: true}),
+    User.find({ status: true }).skip(Number(from)).limit(Number(limit)),
+  ])
 
   res.json({
-    message: 'list of users',
+    total,
     users: users.map((user) => {
       return {
         id: user._id,
@@ -20,6 +31,16 @@ const getUser = async (req, res = response) => {
     }),
   });
 };
+
+const findById = async (req, res = response) => {
+  const { id } = req.params;
+
+  const user = await User.findById(id)
+
+  res.status(200).json({
+    user
+  })
+}
 
 const postUser = async (req, res = response) => {
   const { name, email, password, rol } = req.body;
@@ -40,7 +61,7 @@ const putUser = async (req, res = response) => {
   const { _id, password, google, email, ...body } = req.body;
 
   if (password) {
-    body = bcryptjs.hashSync(password, bcryptjs.genSaltSync(10));
+    body.password = bcryptjs.hashSync(password, bcryptjs.genSaltSync(10));
   }
 
   const user = await User.findByIdAndUpdate(id, body, { new: true });
@@ -51,22 +72,18 @@ const putUser = async (req, res = response) => {
   });
 };
 
-const patchUser = (req, res = response) => {
-  res.json({
-    message: 'patch API',
-  });
-};
+const deleteUser = async (req = request, res = response) => {
+  const { id } = req.params;
 
-const deleteUser = (req, res = response) => {
-  res.status(204).json({
-    message: 'delete API',
-  });
+  await User.findByIdAndUpdate(id, {status: false})
+
+  res.status(204).json();
 };
 
 module.exports = {
-  getUser,
+  getUsers,
+  findById,
   postUser,
   putUser,
-  patchUser,
   deleteUser,
 };
