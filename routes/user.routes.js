@@ -14,6 +14,7 @@ const {
   existingRole,
 } = require('../helpers/db-validators');
 const { paramsValidation } = require('../middlewares/params-validation');
+const { jwtTokenValidate } = require('../middlewares/validar-token');
 
 const router = Router();
 
@@ -70,6 +71,7 @@ router.put(
 router.delete(
   '/:id',
   [
+    jwtTokenValidate,
     check('id', 'No es un ID válido.').isMongoId(),
     check('id').custom(existingId),
     paramsValidation,
