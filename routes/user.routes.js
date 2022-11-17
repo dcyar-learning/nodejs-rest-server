@@ -13,6 +13,7 @@ const {
     existingEmail,
     existingRole,
 } = require('../helpers/db-validators');
+const isAdmin = require('../middlewares/is-admin');
 const { paramsValidation } = require('../middlewares/params-validation');
 const { jwtTokenValidate } = require('../middlewares/validar-token');
 
@@ -73,6 +74,7 @@ router.delete(
     '/:id',
     [
         jwtTokenValidate,
+        isAdmin,
         check('id', 'No es un ID válido.').isMongoId(),
         check('id').custom(existingId),
         paramsValidation,

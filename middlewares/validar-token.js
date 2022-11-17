@@ -17,9 +17,11 @@ const jwtTokenValidate = (req, res, next) => {
 
             const { uid } = payload;
 
-            const user = await User.findOne({ id: uid, status: true });
+            const user = await User.findById(uid);
 
             if (!user) throw new UnauthorizedError();
+
+            if (!user.status) throw new UnauthorizedError();
 
             req.user = user;
 

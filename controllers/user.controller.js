@@ -1,4 +1,3 @@
-const { request, response } = require('express');
 const bcryptjs = require('bcryptjs');
 
 const User = require('../models/User');
@@ -23,7 +22,7 @@ const getUsers = async (req, res) => {
     });
 };
 
-const findById = async (req, res = response) => {
+const findById = async (req, res) => {
     const { id } = req.params;
 
     const user = await User.findById(id);
@@ -33,7 +32,7 @@ const findById = async (req, res = response) => {
     });
 };
 
-const postUser = async (req, res = response) => {
+const postUser = async (req, res) => {
     const {
         name, email, password, rol,
     } = req.body;
@@ -51,7 +50,7 @@ const postUser = async (req, res = response) => {
     });
 };
 
-const putUser = async (req, res = response) => {
+const putUser = async (req, res) => {
     const { id } = req.params;
     const {
         _id, password, google, email, ...body
@@ -69,7 +68,7 @@ const putUser = async (req, res = response) => {
     });
 };
 
-const deleteUser = async (req = request, res = response) => {
+const deleteUser = async (req, res) => {
     const { id } = req.params;
 
     await User.findByIdAndUpdate(id, { status: false });
