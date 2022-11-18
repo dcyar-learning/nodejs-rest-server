@@ -13,9 +13,7 @@ const {
     existingEmail,
     existingRole,
 } = require('../helpers/db-validators');
-const isAdmin = require('../middlewares/is-admin');
-const { paramsValidation } = require('../middlewares/params-validation');
-const { jwtTokenValidate } = require('../middlewares/validar-token');
+const { hasRole, paramsValidation, jwtTokenValidate } = require('../middlewares');
 
 const router = Router();
 
@@ -51,7 +49,7 @@ router.post(
                 min: 5,
             },
         ),
-        // check('rol', 'No es un rol valido.').isIn(['ADMIN', 'USER']),
+        check('rol', 'No es un rol valido.').isIn(['ADMIN', 'USER']),
         check('rol').custom(existingRole),
         paramsValidation,
     ],
@@ -74,7 +72,7 @@ router.delete(
     '/:id',
     [
         jwtTokenValidate,
-        isAdmin,
+        hasRole('ADMIN'),
         check('id', 'No es un ID válido.').isMongoId(),
         check('id').custom(existingId),
         paramsValidation,
